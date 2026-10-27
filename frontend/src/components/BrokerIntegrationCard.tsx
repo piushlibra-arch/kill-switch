@@ -144,10 +144,10 @@ export const BrokerIntegrationCard: React.FC = () => {
 
   const [selectedBroker, setSelectedBroker] = useState<BrokerName>('dhan');
   const [formData, setFormData] = useState<Record<string, string>>({
-    client_id: 'DHAN_1002348',
-    access_token: 'dhan_demo_jwt_access_token_secure',
+    client_id: '',
+    access_token: '',
   });
-  const [isSandbox, setIsSandbox] = useState<boolean>(true);
+  const [isSandbox, setIsSandbox] = useState<boolean>(false);
   const [autoCancelOnLock, setAutoCancelOnLock] = useState<boolean>(true);
   const [autoSquareOffOnLock, setAutoSquareOffOnLock] = useState<boolean>(false);
   const [syncInterval, setSyncInterval] = useState<number>(30);
@@ -173,12 +173,18 @@ export const BrokerIntegrationCard: React.FC = () => {
       const active = (cfgs || []).find((c: any) => c.is_active);
       if (active) {
         setSelectedBroker(active.broker_name);
+        setIsSandbox(Boolean(active.is_sandbox));
         setAutoCancelOnLock(active.settings?.auto_cancel_orders_on_lock ?? true);
         setAutoSquareOffOnLock(active.settings?.auto_square_off_on_lock ?? false);
         setSyncInterval(active.settings?.sync_interval_seconds ?? 30);
         if (active.last_sync_at) {
           setLastSyncTime(new Date(active.last_sync_at).toLocaleTimeString());
         }
+        setFormData((prev) => ({
+          ...prev,
+          client_id: active.client_id_masked || prev.client_id || '',
+          api_key: active.api_key_masked || prev.api_key || '',
+        }));
       }
     } catch (err) {
       console.error('Error fetching broker configs:', err);
@@ -363,23 +369,14 @@ export const BrokerIntegrationCard: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setSelectedBroker(b.name);
-                  // pre-populate demo values for instant testing
-                  if (b.name === 'dhan') {
-                    setFormData({ client_id: 'DHAN_1002348', access_token: 'dhan_demo_jwt_access_token_secure' });
-                  } else if (b.name === 'upstox') {
-                    setFormData({ api_key: 'upstox_sandbox_key', access_token: 'upstox_oauth_token_v2' });
-                  } else if (b.name === 'zerodha') {
-                    setFormData({ api_key: 'kite_key_9921', access_token: 'kite_daily_session_token' });
-                  } else if (b.name === 'fyers') {
-                    setFormData({ client_id: 'FYERS_XC12345', access_token: 'fyers_oauth2_token' });
-                  } else if (b.name === 'angelone') {
-                    setFormData({ api_key: 'smartapi_key_88', client_id: 'A102938', pin: '4821', totp_secret: 'JBSWY3DPEHPK3PXP' });
-                  } else if (b.name === 'breeze') {
-                    setFormData({ api_key: 'breeze_app_key', secret_key: 'breeze_sec_key', access_token: 'breeze_session_token' });
-                  } else if (b.name === 'alpaca') {
-                    setFormData({ api_key: 'alpaca_pk_live', secret_key: 'alpaca_sk_live' });
-                  } else if (b.name === 'binance') {
-                    setFormData({ api_key: 'binance_futures_api_key', secret_key: 'binance_futures_sec_key' });
+                  const existing = connectedBrokers.find((c) => c.broker_name === b.name);
+                  if (existing) {
+                    setIsSandbox(Boolean(existing.is_sandbox));
+                    setFormData({
+                      client_id: existing.client_id_masked || '',
+                      api_key: existing.api_key_masked || '',
+                      access_token: '',
+                    });
                   }
                 }}
                 className={`p-3 rounded-xl border text-left transition-all relative ${
@@ -414,15 +411,43 @@ export const BrokerIntegrationCard: React.FC = () => {
               </div>
               <p className="text-xs text-slate-400 mt-0.5">{activeMeta.tagline}</p>
             </div>
-            <a
-              href={activeMeta.docsUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-rose-400 hover:text-rose-300 font-mono flex items-center gap-1 shrink-0"
-            >
-              <span>API Reference</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSandbox(true);
+                  if (activeMeta.name === 'dhan') {
+                    setFormData({ client_id: 'DHAN_1002348', access_token: 'dhan_demo_jwt_access_token_secure' });
+                  } else if (activeMeta.name === 'upstox') {
+                    setFormData({ api_key: 'upstox_sandbox_key', access_token: 'upstox_oauth_token_v2' });
+                  } else if (activeMeta.name === 'zerodha') {
+                    setFormData({ api_key: 'kite_key_9921', access_token: 'kite_daily_session_token' });
+                  } else if (activeMeta.name === 'fyers') {
+                    setFormData({ client_id: 'FYERS_XC12345', access_token: 'fyers_oauth2_token' });
+                  } else if (activeMeta.name === 'angelone') {
+                    setFormData({ api_key: 'smartapi_key_88', client_id: 'A102938', pin: '4821', totp_secret: 'JBSWY3DPEHPK3PXP' });
+                  } else if (activeMeta.name === 'breeze') {
+                    setFormData({ api_key: 'breeze_app_key', secret_key: 'breeze_sec_key', access_token: 'breeze_session_token' });
+                  } else if (activeMeta.name === 'alpaca') {
+                    setFormData({ api_key: 'alpaca_pk_live', secret_key: 'alpaca_sk_live' });
+                  } else if (activeMeta.name === 'binance') {
+                    setFormData({ api_key: 'binance_futures_api_key', secret_key: 'binance_futures_sec_key' });
+                  }
+                }}
+                className="text-[11px] text-slate-400 hover:text-slate-200 font-mono px-2.5 py-1 rounded-lg border border-slate-800 hover:border-slate-700 bg-slate-900 transition-all"
+              >
+                Fill Demo Credentials
+              </button>
+              <a
+                href={activeMeta.docsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-rose-400 hover:text-rose-300 font-mono flex items-center gap-1 shrink-0"
+              >
+                <span>API Reference</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
           </div>
 
           <form onSubmit={handleConnect} className="space-y-4">
@@ -430,7 +455,7 @@ export const BrokerIntegrationCard: React.FC = () => {
               {activeMeta.fields.map((f) => (
                 <div key={f.key}>
                   <label className="block text-xs font-mono text-slate-300 mb-1">
-                    {f.label} {f.required && <span className="text-rose-400">*</span>}
+                    {f.label} {f.required && !isConnected && <span className="text-rose-400">*</span>}
                   </label>
                   <input
                     type={f.type || 'text'}
@@ -438,7 +463,7 @@ export const BrokerIntegrationCard: React.FC = () => {
                     onChange={(e) => handleInputChange(f.key, e.target.value)}
                     placeholder={f.placeholder}
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-rose-500"
-                    required={f.required}
+                    required={f.required && !isConnected}
                   />
                   {f.helper && (
                     <span className="text-[10px] text-slate-500 mt-1 block font-mono">{f.helper}</span>
@@ -449,7 +474,11 @@ export const BrokerIntegrationCard: React.FC = () => {
 
             {/* Sandbox & Sync Controls */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <label className="flex items-center gap-2.5 p-2.5 bg-slate-900/80 rounded-lg border border-slate-800 text-xs text-slate-300 cursor-pointer">
+              <label className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${
+                isSandbox 
+                  ? 'bg-amber-500/10 border-amber-500/40 text-amber-300' 
+                  : 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
+              }`}>
                 <input
                   type="checkbox"
                   checked={isSandbox}
@@ -457,8 +486,12 @@ export const BrokerIntegrationCard: React.FC = () => {
                   className="rounded bg-slate-800 border-slate-700 text-rose-500 focus:ring-0"
                 />
                 <div>
-                  <span className="font-semibold block">Sandbox / Simulation</span>
-                  <span className="text-[10px] text-slate-500">Test orders without live funds</span>
+                  <span className="font-semibold block font-mono">
+                    {isSandbox ? 'Sandbox / Mock Mode' : 'LIVE API Connection'}
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    {isSandbox ? 'Uses simulated demo data & orders' : 'Direct API calls with live credentials'}
+                  </span>
                 </div>
               </label>
 

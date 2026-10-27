@@ -107,14 +107,14 @@ async def connect_broker(broker_name: str, req: BrokerConnectRequest, db: AsyncS
         config.currency_symbol = c_symbol
         config.locale = c_locale
 
-    # Encrypt credentials securely
-    if req.client_id:
+    # Encrypt credentials securely (only if non-empty and not masked placeholder)
+    if req.client_id and "••••" not in req.client_id and "..." not in req.client_id:
         config.client_id_encrypted = encrypt_credential(req.client_id)
-    if req.api_key:
+    if req.api_key and "••••" not in req.api_key and "..." not in req.api_key:
         config.api_key_encrypted = encrypt_credential(req.api_key)
-    if req.secret_key:
+    if req.secret_key and "••••" not in req.secret_key and "..." not in req.secret_key:
         config.secret_key_encrypted = encrypt_credential(req.secret_key)
-    if req.access_token:
+    if req.access_token and "••••" not in req.access_token and "..." not in req.access_token:
         config.access_token_encrypted = encrypt_credential(req.access_token)
     if req.pin or req.totp_secret:
         pin_totp = json.dumps({"pin": req.pin, "totp_secret": req.totp_secret})
@@ -133,14 +133,19 @@ async def connect_broker(broker_name: str, req: BrokerConnectRequest, db: AsyncS
     await db.commit()
     await db.refresh(config)
 
+    client_id_val = req.client_id or (decrypt_credential(config.client_id_encrypted) if config.client_id_encrypted else "")
+    access_token_val = req.access_token or (decrypt_credential(config.access_token_encrypted) if config.access_token_encrypted else "")
+    api_key_val = req.api_key or (decrypt_credential(config.api_key_encrypted) if config.api_key_encrypted else "")
+    secret_key_val = req.secret_key or (decrypt_credential(config.secret_key_encrypted) if config.secret_key_encrypted else "")
+
     # Register in BrokerManager
     adapter_config = {
         "trader_id": trader_id,
         "broker_name": broker_key,
-        "client_id": req.client_id,
-        "api_key": req.api_key,
-        "secret_key": req.secret_key,
-        "access_token": req.access_token,
+        "client_id": client_id_val,
+        "api_key": api_key_val,
+        "secret_key": secret_key_val,
+        "access_token": access_token_val,
         "pin": req.pin,
         "totp_secret": req.totp_secret,
         "is_sandbox": req.is_sandbox
@@ -291,16 +296,16 @@ async def sync_broker_now(trader_id: str, db: AsyncSession = Depends(get_db)):
     }
 
 @router.get("/positions/{trader_id}")
-async def get_broker_positions(trader_id: str):
-    adapter = broker_manager.get_adapter(trader_id)
+async def get_broker_positions(trader_id: str, db: AsyncSession = Depends(get_db)):
+    adapter = await broker_manager.get_or_restore_adapter(trader_id, db)
     if not adapter:
         adapter = broker_manager.register_adapter(trader_id, "dhan", {"trader_id": trader_id, "is_sandbox": True})
     positions = await adapter.get_positions()
     return [p.model_dump() for p in positions]
 
 @router.get("/orders/{trader_id}")
-async def get_broker_orders(trader_id: str):
-    adapter = broker_manager.get_adapter(trader_id)
+async def get_broker_orders(trader_id: str, db: AsyncSession = Depends(get_db)):
+    adapter = await broker_manager.get_or_restore_adapter(trader_id, db)
     if not adapter:
         adapter = broker_manager.register_adapter(trader_id, "dhan", {"trader_id": trader_id, "is_sandbox": True})
     orders = await adapter.get_order_history()

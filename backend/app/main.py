@@ -12,9 +12,11 @@ async def lifespan(app: FastAPI):
     # Startup: initialize database tables
     await init_db()
     
-    # Seed default baseline
+    # Seed default baseline and restore active broker
     async with AsyncSessionLocal() as db:
         await seed_initial_data(db, settings.DEFAULT_TRADER_ID)
+        from backend.app.brokers.manager import broker_manager
+        await broker_manager.get_or_restore_adapter(settings.DEFAULT_TRADER_ID, db)
         
     yield
     # Shutdown

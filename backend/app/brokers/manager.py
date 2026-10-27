@@ -72,6 +72,48 @@ class BrokerManager:
     def get_adapter(self, trader_id: str) -> Optional[BrokerAdapter]:
         return self._active_adapters.get(trader_id)
 
+    async def get_or_restore_adapter(self, trader_id: str, db: AsyncSession) -> Optional[BrokerAdapter]:
+        adapter = self.get_adapter(trader_id)
+        if adapter:
+            return adapter
+
+        # Check DB for active BrokerConfig
+        stmt = select(BrokerConfig).where(
+            BrokerConfig.trader_id == trader_id,
+            BrokerConfig.is_active == True
+        )
+        res = await db.execute(stmt)
+        config = res.scalars().first()
+        if not config:
+            return None
+
+        client_id = decrypt_credential(config.client_id_encrypted) if config.client_id_encrypted else ""
+        access_token = decrypt_credential(config.access_token_encrypted) if config.access_token_encrypted else ""
+        api_key = decrypt_credential(config.api_key_encrypted) if config.api_key_encrypted else ""
+        secret_key = decrypt_credential(config.secret_key_encrypted) if config.secret_key_encrypted else ""
+        pin = ""
+        totp_secret = ""
+        if config.pin_totp_encrypted:
+            try:
+                pt = json.loads(decrypt_credential(config.pin_totp_encrypted))
+                pin = pt.get("pin", "")
+                totp_secret = pt.get("totp_secret", "")
+            except Exception:
+                pass
+
+        adapter_config = {
+            "trader_id": trader_id,
+            "broker_name": config.broker_name,
+            "client_id": client_id,
+            "access_token": access_token,
+            "api_key": api_key,
+            "secret_key": secret_key,
+            "pin": pin,
+            "totp_secret": totp_secret,
+            "is_sandbox": config.is_sandbox,
+        }
+        return self.register_adapter(trader_id, config.broker_name, adapter_config)
+
     def register_adapter(self, trader_id: str, broker_name: str, config: Dict[str, Any]) -> BrokerAdapter:
         broker_key = broker_name.lower().strip()
         adapter_cls = ADAPTER_MAP.get(broker_key, DhanAdapter)
@@ -100,7 +142,7 @@ class BrokerManager:
         3. If in Orange zone -> enforces soft lock wait or confirmation phrase.
         4. If allowed -> routes order to active broker adapter.
         """
-        adapter = self.get_adapter(trader_id)
+        adapter = await self.get_or_restore_adapter(trader_id, db)
         if not adapter:
             # Fallback to simulated Dhan adapter if none explicitly connected
             adapter = self.register_adapter(trader_id, "dhan", {"trader_id": trader_id, "is_sandbox": True})
@@ -228,7 +270,7 @@ class BrokerManager:
         - Feeds new trades into RulesEngine.
         - Updates Tilt Score in real-time.
         """
-        adapter = self.get_adapter(trader_id)
+        adapter = await self.get_or_restore_adapter(trader_id, db)
         if not adapter:
             return 0
 

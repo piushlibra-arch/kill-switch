@@ -1,6 +1,7 @@
 import asyncio
 import json
 import uuid
+import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, AsyncGenerator, Dict, Any
 import httpx
@@ -14,20 +15,23 @@ from backend.app.brokers.base import (
     BrokerTrade
 )
 
+logger = logging.getLogger("DhanAdapter")
+
 class DhanAdapter(BrokerAdapter):
     """
     Dhan Broker Adapter (Primary integration).
     API: https://dhanhq.co/docs/live/
     Auth: Client ID + Access Token
-    Endpoints:
-      - GET /orders -> order history
-      - GET /positions -> live positions
-      - GET /trades -> executed trades
-      - POST /orders -> place order
-      - DELETE /orders/{id} -> cancel order
+    Endpoints (v2):
+      - GET /v2/orders -> order history
+      - GET /v2/positions -> live positions
+      - GET /v2/trades -> executed trades
+      - GET /v2/fundlimit -> account limits & cash
+      - POST /v2/orders -> place order
+      - DELETE /v2/orders/{id} -> cancel order
       - WebSocket: wss://api-order-update.dhan.co -> live order feed
     """
-    BASE_URL = "https://api.dhan.co"
+    BASE_URL = "https://api.dhan.co/v2"
     WS_URL = "wss://api-order-update.dhan.co"
 
     def __init__(self, config: Dict[str, Any]):
@@ -84,21 +88,23 @@ class DhanAdapter(BrokerAdapter):
     async def get_account_info(self) -> AccountInfo:
         if not self.is_sandbox and self.access_token:
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with httpx.AsyncClient(timeout=8.0) as client:
                     resp = await client.get(f"{self.BASE_URL}/fundlimit", headers=self._headers)
                     if resp.status_code == 200:
                         data = resp.json()
-                        avail = float(data.get("availabelBalance", data.get("availMargin", 250000.0)))
+                        avail = float(data.get("availabelBalance", data.get("availMargin", 0.0)))
+                        utilized = float(data.get("utilizedAmount", data.get("utilisedMargin", 0.0)))
+                        collateral = float(data.get("collateralAmount", 0.0))
                         return AccountInfo(
                             broker_name="dhan",
                             client_id=self.client_id,
                             available_cash=avail,
-                            utilized_margin=float(data.get("utilisedMargin", 50000.0)),
-                            total_collateral=float(data.get("collateralAmount", 0.0)),
+                            utilized_margin=utilized,
+                            total_collateral=collateral,
                             is_live=True
                         )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Dhan get_account_info live call failed: {e}")
 
         # Simulated response for sandbox / prototype
         return AccountInfo(
@@ -113,76 +119,93 @@ class DhanAdapter(BrokerAdapter):
     async def get_positions(self) -> List[Position]:
         if not self.is_sandbox and self.access_token:
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with httpx.AsyncClient(timeout=8.0) as client:
                     resp = await client.get(f"{self.BASE_URL}/positions", headers=self._headers)
                     if resp.status_code == 200:
                         positions = []
-                        for item in resp.json():
-                            positions.append(Position(
-                                symbol=item.get("tradingSymbol", "UNKNOWN"),
-                                product_type=item.get("productType", "INTRADAY"),
-                                quantity=float(item.get("netQty", 0)),
-                                buy_price=float(item.get("buyAvg", 0)),
-                                current_price=float(item.get("costPrice", item.get("buyAvg", 0))),
-                                pnl=float(item.get("realizedProfit", 0)) + float(item.get("unrealizedProfit", 0)),
-                                realized_pnl=float(item.get("realizedProfit", 0)),
-                                unrealized_pnl=float(item.get("unrealizedProfit", 0)),
-                                exchange=item.get("exchangeSegment", "NSE")
-                            ))
-                        return positions
-            except Exception:
-                pass
+                        data = resp.json()
+                        if isinstance(data, list):
+                            for item in data:
+                                positions.append(Position(
+                                    symbol=item.get("tradingSymbol", "UNKNOWN"),
+                                    product_type=item.get("productType", "INTRADAY"),
+                                    quantity=float(item.get("netQty", 0)),
+                                    buy_price=float(item.get("buyAvg", 0)),
+                                    current_price=float(item.get("costPrice", item.get("buyAvg", 0))),
+                                    pnl=float(item.get("realizedProfit", 0)) + float(item.get("unrealizedProfit", 0)),
+                                    realized_pnl=float(item.get("realizedProfit", 0)),
+                                    unrealized_pnl=float(item.get("unrealizedProfit", 0)),
+                                    exchange=item.get("exchangeSegment", "NSE")
+                                ))
+                            return positions
+            except Exception as e:
+                logger.error(f"Dhan get_positions live call failed: {e}")
 
         return self._mock_positions
 
     async def get_order_history(self, from_date: Optional[datetime] = None, to_date: Optional[datetime] = None) -> List[Order]:
         if not self.is_sandbox and self.access_token:
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with httpx.AsyncClient(timeout=8.0) as client:
                     resp = await client.get(f"{self.BASE_URL}/orders", headers=self._headers)
                     if resp.status_code == 200:
                         orders = []
-                        for o in resp.json():
-                            orders.append(Order(
-                                order_id=str(o.get("orderId")),
-                                broker_order_id=str(o.get("orderId")),
-                                symbol=o.get("tradingSymbol", ""),
-                                order_type=o.get("orderType", "MARKET"),
-                                transaction_type=o.get("transactionType", "BUY"),
-                                quantity=float(o.get("quantity", 0)),
-                                filled_quantity=float(o.get("filledQty", 0)),
-                                price=float(o.get("price", 0)),
-                                trigger_price=float(o.get("triggerPrice", 0)) if o.get("triggerPrice") else None,
-                                status=o.get("orderStatus", "OPEN"),
-                                tag=o.get("correlationId")
-                            ))
-                        return orders
-            except Exception:
-                pass
+                        data = resp.json()
+                        if isinstance(data, list):
+                            for o in data:
+                                orders.append(Order(
+                                    order_id=str(o.get("orderId", "")),
+                                    broker_order_id=str(o.get("orderId", "")),
+                                    symbol=o.get("tradingSymbol", ""),
+                                    order_type=o.get("orderType", "MARKET"),
+                                    transaction_type=o.get("transactionType", "BUY"),
+                                    quantity=float(o.get("quantity", 0)),
+                                    filled_quantity=float(o.get("filledQty", 0)),
+                                    price=float(o.get("price", 0)),
+                                    trigger_price=float(o.get("triggerPrice", 0)) if o.get("triggerPrice") else None,
+                                    status=o.get("orderStatus", "OPEN"),
+                                    tag=o.get("correlationId")
+                                ))
+                            return orders
+            except Exception as e:
+                logger.error(f"Dhan get_order_history live call failed: {e}")
 
         return self._mock_orders
 
     async def get_trades(self, from_date: Optional[datetime] = None, to_date: Optional[datetime] = None) -> List[BrokerTrade]:
         if not self.is_sandbox and self.access_token:
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with httpx.AsyncClient(timeout=8.0) as client:
                     resp = await client.get(f"{self.BASE_URL}/trades", headers=self._headers)
                     if resp.status_code == 200:
                         trades = []
-                        for t in resp.json():
-                            trades.append(BrokerTrade(
-                                trade_id=str(t.get("tradeId", uuid.uuid4().hex[:8])),
-                                order_id=str(t.get("orderId", "")),
-                                symbol=t.get("tradingSymbol", ""),
-                                transaction_type=t.get("transactionType", "BUY"),
-                                quantity=float(t.get("tradedQuantity", 0)),
-                                execution_price=float(t.get("tradedPrice", 0)),
-                                timestamp=datetime.utcnow(),
-                                value=float(t.get("tradedPrice", 0)) * float(t.get("tradedQuantity", 0))
-                            ))
-                        return trades
-            except Exception:
-                pass
+                        data = resp.json()
+                        if isinstance(data, list):
+                            for t in data:
+                                trade_ts = datetime.utcnow()
+                                for time_key in ["exchangeTime", "createTime", "tradeTime"]:
+                                    if t.get(time_key):
+                                        try:
+                                            trade_ts = datetime.strptime(t[time_key], "%Y-%m-%d %H:%M:%S")
+                                            break
+                                        except Exception:
+                                            pass
+
+                                qty = float(t.get("tradedQuantity", 0))
+                                price = float(t.get("tradedPrice", 0))
+                                trades.append(BrokerTrade(
+                                    trade_id=str(t.get("exchangeTradeId") or t.get("orderId") or uuid.uuid4().hex[:8]),
+                                    order_id=str(t.get("orderId", "")),
+                                    symbol=t.get("tradingSymbol", ""),
+                                    transaction_type=t.get("transactionType", "BUY"),
+                                    quantity=qty,
+                                    execution_price=price,
+                                    timestamp=trade_ts,
+                                    value=qty * price
+                                ))
+                            return trades
+            except Exception as e:
+                logger.error(f"Dhan get_trades live call failed: {e}")
 
         return [
             BrokerTrade(
