@@ -174,18 +174,20 @@ export const TradeForm: React.FC = () => {
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-5 border border-slate-800">
+    <div className="bb-card rounded-xl p-4 sm:p-5">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+      <div className="flex items-center justify-between pb-3 border-b border-[#1e2530] mb-4">
         <div className="flex items-center gap-2">
-          <PlusCircle className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">
-            Manual Trade Entry
-          </h3>
+          <PlusCircle className="w-4 h-4 text-[#ff6600]" />
+          <div>
+            <h3 className="bb-header text-xs tracking-wider">
+              Manual Trade Execution // Rules Engine
+            </h3>
+            <span className="text-[10px] font-mono text-slate-400">
+              Evaluates All 10 Tilt Rules on Submit
+            </span>
+          </div>
         </div>
-        <span className="text-[11px] font-mono text-slate-400">
-          Evaluates All 10 Tilt Rules on Submit
-        </span>
       </div>
 
       {/* Preset Scenarios Buttons */}
@@ -259,7 +261,7 @@ export const TradeForm: React.FC = () => {
               type="text"
               value={instrument}
               onChange={(e) => setInstrument(e.target.value.toUpperCase())}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
+              className="w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#ff6600]"
               required
             />
           </div>
@@ -269,7 +271,7 @@ export const TradeForm: React.FC = () => {
             <label className="block text-xs font-mono text-slate-400 mb-1">
               Direction
             </label>
-            <div className="grid grid-cols-2 gap-1 bg-slate-900 p-0.5 rounded-lg border border-slate-700">
+            <div className="grid grid-cols-2 gap-1 bg-[#141820] p-0.5 rounded-lg border border-[#1e2530]">
               <button
                 type="button"
                 onClick={() => {
@@ -278,8 +280,8 @@ export const TradeForm: React.FC = () => {
                 }}
                 className={`py-1 text-xs font-bold rounded flex items-center justify-center gap-1 transition-all ${
                   tradeType === 'long'
-                    ? 'bg-emerald-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#00d084] text-black font-mono shadow'
+                    : 'text-slate-400 hover:text-slate-200 font-mono'
                 }`}
               >
                 <TrendingUp className="w-3 h-3" /> LONG
@@ -292,8 +294,8 @@ export const TradeForm: React.FC = () => {
                 }}
                 className={`py-1 text-xs font-bold rounded flex items-center justify-center gap-1 transition-all ${
                   tradeType === 'short'
-                    ? 'bg-rose-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#ff3b3b] text-white font-mono shadow'
+                    : 'text-slate-400 hover:text-slate-200 font-mono'
                 }`}
               >
                 <TrendingDown className="w-3 h-3" /> SHORT
@@ -314,7 +316,7 @@ export const TradeForm: React.FC = () => {
                 setPositionSize(e.target.value);
                 handlePriceChange(entryPrice, exitPrice, e.target.value, tradeType);
               }}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
+              className="w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#ff6600]"
               required
             />
           </div>
@@ -329,8 +331,8 @@ export const TradeForm: React.FC = () => {
               step="any"
               value={pnl}
               onChange={(e) => setPnl(e.target.value)}
-              className={`w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold focus:outline-none focus:border-rose-500 ${
-                parseFloat(pnl) >= 0 ? 'text-emerald-400' : 'text-rose-400'
+              className={`w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs font-mono font-bold focus:outline-none focus:border-[#ff6600] ${
+                parseFloat(pnl) >= 0 ? 'text-[#00d084]' : 'text-[#ff3b3b]'
               }`}
               required
             />
@@ -351,7 +353,7 @@ export const TradeForm: React.FC = () => {
                 setEntryPrice(e.target.value);
                 handlePriceChange(e.target.value, exitPrice, positionSize, tradeType);
               }}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
+              className="w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#ff6600]"
               required
             />
           </div>
@@ -368,7 +370,7 @@ export const TradeForm: React.FC = () => {
                 setExitPrice(e.target.value);
                 handlePriceChange(entryPrice, e.target.value, positionSize, tradeType);
               }}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
+              className="w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#ff6600]"
               required
             />
           </div>
@@ -380,7 +382,7 @@ export const TradeForm: React.FC = () => {
             <select
               value={setupPattern}
               onChange={(e) => setSetupPattern(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
+              className="w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-[#ff6600]"
             >
               <option value="BREAKOUT">BREAKOUT</option>
               <option value="PULLBACK">PULLBACK</option>
@@ -402,7 +404,7 @@ export const TradeForm: React.FC = () => {
               step="0.05"
               value={extensionRatio}
               onChange={(e) => setExtensionRatio(e.target.value)}
-              className="w-full accent-rose-500 cursor-pointer"
+              className="w-full accent-[#ff6600] cursor-pointer"
             />
           </div>
         </div>
@@ -414,7 +416,7 @@ export const TradeForm: React.FC = () => {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Trade execution thesis / notes (optional)"
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-rose-500"
+            className="w-full bg-[#141820] border border-[#1e2530] rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#ff6600]"
           />
         </div>
 
@@ -423,12 +425,12 @@ export const TradeForm: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2.5 px-4 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition-all ${
+            className={`w-full py-2.5 px-4 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 transition-all font-mono ${
               hardLockActive
-                ? 'bg-rose-950 border border-rose-500/60 text-rose-300 hover:bg-rose-900 shadow-lg shadow-rose-900/30'
+                ? 'bg-[#ff3b3b]/20 border border-[#ff3b3b] text-[#ff3b3b] hover:bg-[#ff3b3b]/30 shadow-lg shadow-[#ff3b3b]/20'
                 : softLockActive
-                ? 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-600/30'
-                : 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20'
+                ? 'bg-[#ff8800] hover:bg-[#ffaa00] text-white shadow-lg shadow-[#ff8800]/20'
+                : 'bg-[#ff6600] hover:bg-[#ff8800] text-white shadow-lg shadow-[#ff6600]/25'
             }`}
           >
             <Zap className="w-4 h-4" />

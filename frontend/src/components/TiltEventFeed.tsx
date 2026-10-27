@@ -62,30 +62,33 @@ export const TiltEventFeed: React.FC = () => {
   const { formatCurrency } = useCurrency();
 
   return (
-    <div className="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col h-[520px]">
+    <div className="bb-card rounded-xl p-4 sm:p-5 flex flex-col h-[520px]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+      <div className="flex items-center justify-between pb-3 border-b border-[#1e2530] shrink-0">
         <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-amber-400" />
-          <h3 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">
-            Tilt Trigger Stream
-          </h3>
+          <Zap className="w-4 h-4 text-[#ff6600]" />
+          <div>
+            <h3 className="bb-header text-xs tracking-wider">
+              Tilt Trigger Stream
+            </h3>
+            <span className="text-[10px] font-mono text-slate-400">
+              Live Behavioral Audit Stream
+            </span>
+          </div>
         </div>
-        <span className="text-[11px] font-mono text-slate-400">
-          {events.length} trigger{events.length === 1 ? '' : 's'} recorded
+        <span className="text-[10px] font-mono text-slate-400 bg-[#141820] px-2 py-0.5 rounded border border-[#1e2530]">
+          {events.length} trigger{events.length === 1 ? '' : 's'}
         </span>
       </div>
 
       {/* Events List */}
-      <div className="overflow-y-auto space-y-2.5 mt-3 pr-1.5 flex-1">
+      <div className="overflow-y-auto space-y-2 mt-3 pr-1 flex-1 font-mono">
         {events.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
-            <div className="w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center mb-3">
-              <Clock className="w-6 h-6 text-slate-600" />
-            </div>
-            <p className="text-xs font-medium text-slate-400">No Tilt Events Yet</p>
-            <p className="text-[11px] text-slate-600 max-w-xs mt-1">
-              Events will populate in real-time as the rules engine detects behavioral anomalies or losses.
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 border border-dashed border-[#1e2530] rounded-lg">
+            <Clock className="w-8 h-8 text-[#ff6600]/40 mb-2 animate-pulse" />
+            <p className="text-xs font-mono text-slate-400">NO TILT TRIGGERS</p>
+            <p className="text-[10px] text-slate-600 max-w-xs mt-0.5">
+              Rules engine operates within baseline tolerances.
             </p>
           </div>
         ) : (
@@ -93,7 +96,7 @@ export const TiltEventFeed: React.FC = () => {
             const meta = RULE_METAS[ev.event_type] || {
               label: ev.event_type,
               desc: 'Custom rule trigger',
-              badge: 'bg-slate-700/50 text-slate-300 border-slate-600',
+              badge: 'bg-[#141820] text-slate-300 border-[#1e2530]',
             };
 
             const timeStr = ev.timestamp
@@ -103,18 +106,18 @@ export const TiltEventFeed: React.FC = () => {
             return (
               <div
                 key={ev.id || `${ev.event_type}-${idx}`}
-                className="bg-slate-900/80 hover:bg-slate-850 border border-slate-800/90 hover:border-slate-700/80 rounded-xl p-3 transition-all"
+                className="bg-[#141820] hover:bg-[#1a202c] border border-[#1e2530] hover:border-[#2a3545] rounded-lg p-2.5 transition-all text-xs"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded border ${meta.badge}`}>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${meta.badge}`}>
                       +{ev.points_added} pts
                     </span>
-                    <span className="text-xs font-semibold text-slate-200">
+                    <span className="text-xs font-bold text-white tracking-wide">
                       {meta.label}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                  <span className="text-[10px] text-slate-500 shrink-0">
                     {timeStr}
                   </span>
                 </div>

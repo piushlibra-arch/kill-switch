@@ -15,37 +15,37 @@ export const TiltGauge: React.FC = () => {
         return {
           title: 'CALM & OBJECTIVE',
           subtitle: 'Execution strictly adheres to trader baseline guardrails.',
-          badgeColor: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
-          icon: <ShieldCheck className="w-5 h-5 text-emerald-400" />,
-          shadow: 'shadow-[0_0_40px_-10px_rgba(16,185,129,0.25)]',
-          needleColor: '#10B981',
+          badgeColor: 'text-[#00d084] border-[#00d084]/30 bg-[#00d084]/10',
+          icon: <ShieldCheck className="w-5 h-5 text-[#00d084]" />,
+          shadow: 'shadow-[0_0_40px_-10px_rgba(0,208,132,0.25)]',
+          needleColor: '#00d084',
         };
       case 'yellow':
         return {
           title: 'ELEVATED EMOTIONAL TENSION',
           subtitle: 'Loss or frequency spikes detected. Slow down execution speed.',
-          badgeColor: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
-          icon: <AlertTriangle className="w-5 h-5 text-amber-400" />,
-          shadow: 'shadow-[0_0_40px_-10px_rgba(245,158,11,0.3)]',
-          needleColor: '#F59E0B',
+          badgeColor: 'text-[#ffd700] border-[#ffd700]/30 bg-[#ffd700]/10',
+          icon: <AlertTriangle className="w-5 h-5 text-[#ffd700]" />,
+          shadow: 'shadow-[0_0_40px_-10px_rgba(255,215,0,0.3)]',
+          needleColor: '#ffd700',
         };
       case 'orange':
         return {
           title: 'SOFT LOCK THRESHOLD ENGAGED',
           subtitle: 'Revenge or size escalation tendencies active. 60s cooldown enforced.',
-          badgeColor: 'text-orange-400 border-orange-500/40 bg-orange-500/20',
-          icon: <Lock className="w-5 h-5 text-orange-400 animate-bounce" />,
-          shadow: 'shadow-[0_0_50px_-10px_rgba(249,115,22,0.4)]',
-          needleColor: '#F97316',
+          badgeColor: 'text-[#ff6600] border-[#ff6600]/40 bg-[#ff6600]/20',
+          icon: <Lock className="w-5 h-5 text-[#ff6600] animate-bounce" />,
+          shadow: 'shadow-[0_0_50px_-10px_rgba(255,102,0,0.4)]',
+          needleColor: '#ff6600',
         };
       case 'red':
         return {
           title: 'KILL SWITCH ACTIVATED — HARD LOCK',
           subtitle: 'Severe tilt detected. Trading locked for 30 minutes minimum.',
-          badgeColor: 'text-rose-400 border-rose-500/50 bg-rose-500/20',
-          icon: <Flame className="w-5 h-5 text-rose-500 animate-pulse" />,
-          shadow: 'shadow-[0_0_60px_-5px_rgba(239,68,68,0.5)]',
-          needleColor: '#EF4444',
+          badgeColor: 'text-[#ff3b3b] border-[#ff3b3b]/50 bg-[#ff3b3b]/20',
+          icon: <Flame className="w-5 h-5 text-[#ff3b3b] animate-pulse" />,
+          shadow: 'shadow-[0_0_60px_-5px_rgba(255,59,59,0.5)]',
+          needleColor: '#ff3b3b',
         };
     }
   };
@@ -69,12 +69,12 @@ export const TiltGauge: React.FC = () => {
   const redLen = circumference * 0.10;
 
   return (
-    <div className={`relative glass-panel rounded-2xl p-6 flex flex-col items-center justify-between border border-slate-800 transition-all duration-500 ${info.shadow}`}>
+    <div className={`relative bb-card rounded-xl p-5 flex flex-col items-center justify-between border border-[#1e2530] transition-all duration-500 ${info.shadow}`}>
       {/* Header */}
-      <div className="w-full flex items-center justify-between mb-2">
+      <div className="w-full flex items-center justify-between pb-3 border-b border-[#1e2530] mb-3">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping-slow" />
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-300">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ff6600] animate-ping-slow" />
+          <h2 className="bb-header text-xs tracking-wider">
             Real-Time Tilt Score
           </h2>
         </div>
@@ -118,7 +118,7 @@ export const TiltGauge: React.FC = () => {
           <path
             d="M 40 150 A 110 110 0 0 1 260 150"
             fill="none"
-            stroke="#10B981"
+            stroke="#00d084"
             strokeWidth={strokeWidth}
             strokeDasharray={`${greenLen} ${circumference}`}
             strokeDashoffset="0"
@@ -129,7 +129,7 @@ export const TiltGauge: React.FC = () => {
           <path
             d="M 40 150 A 110 110 0 0 1 260 150"
             fill="none"
-            stroke="#F59E0B"
+            stroke="#ffd700"
             strokeWidth={strokeWidth}
             strokeDasharray={`${yellowLen} ${circumference}`}
             strokeDashoffset={`-${greenLen}`}
@@ -140,7 +140,7 @@ export const TiltGauge: React.FC = () => {
           <path
             d="M 40 150 A 110 110 0 0 1 260 150"
             fill="none"
-            stroke="#F97316"
+            stroke="#ff6600"
             strokeWidth={strokeWidth}
             strokeDasharray={`${orangeLen} ${circumference}`}
             strokeDashoffset={`-${greenLen + yellowLen}`}
@@ -151,7 +151,7 @@ export const TiltGauge: React.FC = () => {
           <path
             d="M 40 150 A 110 110 0 0 1 260 150"
             fill="none"
-            stroke="#EF4444"
+            stroke="#ff3b3b"
             strokeWidth={strokeWidth}
             strokeDasharray={`${redLen} ${circumference}`}
             strokeDashoffset={`-${greenLen + yellowLen + orangeLen}`}

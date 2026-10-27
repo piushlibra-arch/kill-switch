@@ -4,59 +4,90 @@
 
 @layer base {
   body {
-    background-color: #080B11;
-    color: #F1F5F9;
+    background-color: #0a0c10;
+    color: #e2e8f0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Custom glow and glass effects */
+/* Bloomberg Terminal Styling */
+.bb-card {
+  background-color: #0f1218;
+  border: 1px solid #1e2530;
+}
+
+.bb-card:hover {
+  border-color: #2a3545;
+}
+
+.bb-card-elevated {
+  background-color: #141820;
+  border: 1px solid #2a3545;
+}
+
+.bb-header {
+  color: #ff6600;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bb-label {
+  color: #ff6600;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.bb-mono {
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+}
+
+/* Backwards compatibility for glass panels */
 .glass-panel {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0f1218;
+  border: 1px solid #1e2530;
 }
 
 .glass-panel-elevated {
-  background: rgba(22, 30, 46, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  background: #141820;
+  border: 1px solid #2a3545;
 }
 
 .glow-green {
-  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 20px -5px rgba(0, 208, 132, 0.4);
 }
 
 .glow-yellow {
-  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 20px -5px rgba(255, 215, 0, 0.45);
 }
 
 .glow-orange {
-  box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.5);
+  box-shadow: 0 0 25px -5px rgba(255, 102, 0, 0.5);
 }
 
 .glow-red {
-  box-shadow: 0 0 35px -5px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 30px -5px rgba(255, 59, 59, 0.6);
 }
 
-/* Custom scrollbars */
+/* Custom Bloomberg terminal scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: #0a0c10;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(71, 85, 105, 0.6);
-  border-radius: 9999px;
+  background: #1e2530;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.8);
+  background: #ff6600;
 }

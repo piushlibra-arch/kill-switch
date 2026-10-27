@@ -7,8 +7,6 @@ import {
   Settings as SettingsIcon, 
   RotateCcw, 
   Play, 
-  Square,
-  Radio,
   Coins
 } from 'lucide-react';
 import { useTilt } from '../context/TiltContext';
@@ -27,7 +25,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     isWsConnected,
     setIsResetModalOpen,
     startNewSession,
-    endCurrentSession,
   } = useTilt();
   const { currencySymbol, currencyCode, brokerName } = useCurrency();
 
@@ -35,26 +32,26 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     switch (status) {
       case 'green':
         return {
-          bg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
-          dot: 'bg-emerald-500',
+          bg: 'bg-[#00d084]/10 border-[#00d084]/30 text-[#00d084]',
+          dot: 'bg-[#00d084]',
           label: 'OPTIMAL (GREEN)',
         };
       case 'yellow':
         return {
-          bg: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
-          dot: 'bg-amber-500',
+          bg: 'bg-[#ffd700]/10 border-[#ffd700]/30 text-[#ffd700]',
+          dot: 'bg-[#ffd700]',
           label: 'WARNING (YELLOW)',
         };
       case 'orange':
         return {
-          bg: 'bg-orange-500/20 border-orange-500/40 text-orange-400',
-          dot: 'bg-orange-500 animate-ping',
+          bg: 'bg-[#ff6600]/15 border-[#ff6600]/40 text-[#ff6600]',
+          dot: 'bg-[#ff6600] animate-ping',
           label: 'SOFT LOCK (ORANGE)',
         };
       case 'red':
         return {
-          bg: 'bg-rose-500/25 border-rose-500/50 text-rose-300 font-bold',
-          dot: 'bg-rose-500 animate-ping',
+          bg: 'bg-[#ff3b3b]/20 border-[#ff3b3b]/50 text-[#ff3b3b] font-bold',
+          dot: 'bg-[#ff3b3b] animate-ping',
           label: 'KILL SWITCH (RED)',
         };
     }
@@ -63,97 +60,99 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const badge = getStatusBadge();
 
   return (
-    <header className="border-b border-slate-800/80 bg-[#0B0F19]/90 backdrop-blur-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="border-b border-[#1e2530] bg-[#0a0c10]/95 backdrop-blur-md sticky top-0 z-40">
+      <div className="max-w-[1680px] mx-auto px-3 sm:px-5 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-amber-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#ff6600] to-[#b34700] flex items-center justify-center shadow-lg shadow-[#ff6600]/20 border border-[#ff6600]/40">
             <ShieldAlert className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                AegisTilt
+              <span className="font-bold text-lg tracking-tight text-white font-mono">
+                AEGIS<span className="text-[#ff6600]">TILT</span>
               </span>
-              <span className="text-[10px] font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 font-semibold">
-                Intelligence Layer
+              <span className="text-[10px] font-mono tracking-widest uppercase px-1.5 py-0.5 rounded bg-[#ff6600]/10 border border-[#ff6600]/30 text-[#ff6600] font-semibold">
+                BLOOMBERG 2.0
               </span>
             </div>
             <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
-              <span>Sess: {sessionId ? sessionId.slice(0, 18) : 'active'}</span>
+              <span>SESS: {sessionId ? sessionId.slice(0, 16) : 'ACTIVE'}</span>
               <span className="inline-flex items-center gap-1">
-                <span className={`w-1.5 h-1.5 rounded-full ${isWsConnected ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                <span className="text-[10px] text-slate-500">{isWsConnected ? 'LIVE WS' : 'OFFLINE'}</span>
+                <span className={`w-1.5 h-1.5 rounded-full ${isWsConnected ? 'bg-[#00d084]' : 'bg-[#ff3b3b]'}`} />
+                <span className="text-[10px] text-slate-400 font-bold">{isWsConnected ? 'FEED LIVE' : 'WS DISCONNECTED'}</span>
               </span>
             </div>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800">
+        <nav className="hidden md:flex items-center gap-1 bg-[#0f1218] p-1 rounded-lg border border-[#1e2530]">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono font-medium transition-all ${
               activeTab === 'dashboard'
-                ? 'bg-slate-800 text-white shadow-sm border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-[#141820] text-[#ff6600] shadow-sm border border-[#ff6600]/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-[#141820]/60'
             }`}
           >
-            <Activity className="w-4 h-4 text-emerald-400" />
-            Dashboard
+            <Activity className="w-3.5 h-3.5 text-[#ff6600]" />
+            TERMINAL
           </button>
 
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono font-medium transition-all ${
               activeTab === 'analytics'
-                ? 'bg-slate-800 text-white shadow-sm border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-[#141820] text-[#ff6600] shadow-sm border border-[#ff6600]/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-[#141820]/60'
             }`}
           >
-            <BarChart3 className="w-4 h-4 text-amber-400" />
-            Analytics
+            <BarChart3 className="w-3.5 h-3.5 text-[#ffd700]" />
+            ANALYTICS
           </button>
 
           <button
             onClick={() => setActiveTab('review')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono font-medium transition-all ${
               activeTab === 'review'
-                ? 'bg-slate-800 text-white shadow-sm border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-[#141820] text-[#ff6600] shadow-sm border border-[#ff6600]/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-[#141820]/60'
             }`}
           >
-            <FileText className="w-4 h-4 text-cyan-400" />
-            Session Review
+            <FileText className="w-3.5 h-3.5 text-[#00d084]" />
+            SESSION REVIEW
           </button>
 
           <button
             onClick={() => setActiveTab('settings')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-mono font-medium transition-all ${
               activeTab === 'settings'
-                ? 'bg-slate-800 text-white shadow-sm border border-slate-700/50'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-[#141820] text-[#ff6600] shadow-sm border border-[#ff6600]/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-[#141820]/60'
             }`}
           >
-            <SettingsIcon className="w-4 h-4 text-slate-400" />
-            Settings
+            <SettingsIcon className="w-3.5 h-3.5 text-slate-400" />
+            CONFIG & BASELINE
           </button>
         </nav>
 
         {/* Right Status & Controls */}
         <div className="flex items-center gap-2.5">
-          {/* Active Broker & Currency Pill */}
-          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
-            <Coins className="w-3.5 h-3.5 text-amber-400" />
+          {/* Active Broker & Dynamic Currency Pill */}
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#0f1218] border border-[#1e2530] text-xs font-mono text-slate-300">
+            <Coins className="w-3.5 h-3.5 text-[#ff6600]" />
             <span className="font-bold text-white uppercase">{brokerName}</span>
-            <span className="text-amber-300 font-bold bg-amber-500/10 px-1 rounded">{currencySymbol} {currencyCode}</span>
+            <span className="text-[#ff6600] font-bold bg-[#ff6600]/10 px-1 rounded border border-[#ff6600]/20">
+              {currencySymbol} {currencyCode}
+            </span>
           </div>
 
           {/* Live Tilt Status Pill */}
-          <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-mono transition-all ${badge.bg}`}>
+          <div className={`hidden sm:flex items-center gap-2 px-3 py-1 rounded-md border text-xs font-mono transition-all ${badge.bg}`}>
             <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
             <span>{badge.label}</span>
-            <span className="font-bold text-white pl-1 border-l border-slate-700/50">
+            <span className="font-bold text-white pl-1.5 border-l border-white/20">
               {currentScore}/100
             </span>
           </div>
@@ -162,60 +161,60 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           <button
             onClick={() => setIsResetModalOpen(true)}
             title="Manual Score Reset (Logged)"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/70 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 text-xs font-medium transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0f1218] hover:bg-[#141820] text-slate-300 hover:text-white rounded-md border border-[#1e2530] text-xs font-mono transition-all"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-            <span className="hidden lg:inline">Reset Score</span>
+            <RotateCcw className="w-3.5 h-3.5 text-[#ff6600]" />
+            <span className="hidden lg:inline">RESET</span>
           </button>
 
           <button
             onClick={() => startNewSession('Trader started new session')}
             title="Start New Trading Session (Clears tilt)"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#00d084]/15 hover:bg-[#00d084]/25 text-[#00d084] border border-[#00d084]/30 rounded-md text-xs font-mono transition-all"
           >
-            <Play className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden lg:inline">New Session</span>
+            <Play className="w-3.5 h-3.5 text-[#00d084]" />
+            <span className="hidden lg:inline">NEW SESS</span>
           </button>
         </div>
       </div>
 
       {/* Mobile nav tabs */}
-      <div className="md:hidden flex items-center justify-around border-t border-slate-800/80 px-2 py-1.5 bg-[#0A0D15]">
+      <div className="md:hidden flex items-center justify-around border-t border-[#1e2530] px-2 py-1.5 bg-[#0a0c10]">
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded ${
-            activeTab === 'dashboard' ? 'bg-slate-800 text-white' : 'text-slate-400'
+          className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded ${
+            activeTab === 'dashboard' ? 'bg-[#141820] text-[#ff6600] border border-[#ff6600]/30' : 'text-slate-400'
           }`}
         >
-          <Activity className="w-3.5 h-3.5 text-emerald-400" />
-          Dashboard
+          <Activity className="w-3.5 h-3.5 text-[#ff6600]" />
+          Terminal
         </button>
         <button
           onClick={() => setActiveTab('analytics')}
-          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded ${
-            activeTab === 'analytics' ? 'bg-slate-800 text-white' : 'text-slate-400'
+          className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded ${
+            activeTab === 'analytics' ? 'bg-[#141820] text-[#ffd700] border border-[#ffd700]/30' : 'text-slate-400'
           }`}
         >
-          <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
+          <BarChart3 className="w-3.5 h-3.5 text-[#ffd700]" />
           Analytics
         </button>
         <button
           onClick={() => setActiveTab('review')}
-          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded ${
-            activeTab === 'review' ? 'bg-slate-800 text-white' : 'text-slate-400'
+          className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded ${
+            activeTab === 'review' ? 'bg-[#141820] text-[#00d084] border border-[#00d084]/30' : 'text-slate-400'
           }`}
         >
-          <FileText className="w-3.5 h-3.5 text-cyan-400" />
+          <FileText className="w-3.5 h-3.5 text-[#00d084]" />
           Review
         </button>
         <button
           onClick={() => setActiveTab('settings')}
-          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded ${
-            activeTab === 'settings' ? 'bg-slate-800 text-white' : 'text-slate-400'
+          className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded ${
+            activeTab === 'settings' ? 'bg-[#141820] text-slate-200 border border-slate-700' : 'text-slate-400'
           }`}
         >
           <SettingsIcon className="w-3.5 h-3.5" />
-          Settings
+          Config
         </button>
       </div>
     </header>

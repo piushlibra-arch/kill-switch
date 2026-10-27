@@ -75,7 +75,7 @@ const MainContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'review' | 'settings'>('dashboard');
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#070A10] text-slate-100 font-sans selection:bg-rose-500/30 selection:text-rose-200">
+    <div className="min-h-screen flex flex-col bg-[#0a0c10] text-slate-100 font-sans selection:bg-[#ff6600]/30 selection:text-white">
       <Navbar activeTab={activeTab} setActiveTab={(tab: any) => setActiveTab(tab)} />
 
       <main className="flex-1 pb-12">

@@ -8,19 +8,30 @@ export default {
   theme: {
     extend: {
       colors: {
+        bb: {
+          bg: '#0a0c10',
+          card: '#0f1218',
+          elevated: '#141820',
+          border: '#1e2530',
+          borderActive: '#2a3545',
+          orange: '#ff6600',
+          profit: '#00d084',
+          loss: '#ff3b3b',
+          warning: '#ffd700',
+        },
         tilt: {
-          green: '#10B981',
-          yellow: '#F59E0B',
-          orange: '#F97316',
-          red: '#EF4444',
-          dark: '#0B0F19',
-          card: '#111827',
-          cardBorder: '#1F2937',
-          subtle: '#374151',
+          green: '#00d084',
+          yellow: '#ffd700',
+          orange: '#ff6600',
+          red: '#ff3b3b',
+          dark: '#0a0c10',
+          card: '#0f1218',
+          cardBorder: '#1e2530',
+          subtle: '#2a3545',
         }
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
+        mono: ['"IBM Plex Mono"', 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       animation: {
